@@ -229,12 +229,13 @@
     ],
     "status": "Beta",
     "credentials": {
-      "username": "tester_debug",
-      "password": "",
-      "adminUrl": "https://xiroro-ab.github.io/ujian-online-debugging/",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "kampanngh14",
+      "adminUrl": "https://xiroro-ab.github.io/ujian-online-debugging/#page-guru-login",
       "notes": "Lingkungan testing untuk butir soal dan skrip validasi."
     },
-    "createdAt": "2026-11-09T08:10:00.000Z"
+    "createdAt": "2026-11-09T08:10:00.000Z",
+    "updatedAt": "2026-11-09T10:38:00.125Z"
   },
   {
     "id": "proj-soal-infor-9-1",
