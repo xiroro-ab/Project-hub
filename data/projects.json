@@ -55,12 +55,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "operator_absensi",
-      "password": "",
+      "username": "admin",
+      "password": "admin",
       "adminUrl": "https://xiroro-ab.github.io/Absensi-smp58/",
       "notes": "Pencatatan kehadiran kelas dan rekapitulasi presensi."
     },
-    "createdAt": "2026-11-09T08:02:00.000Z"
+    "createdAt": "2026-11-09T08:02:00.000Z",
+    "updatedAt": "2026-11-09T10:15:05.481Z"
   },
   {
     "id": "proj-pemilos-58",
