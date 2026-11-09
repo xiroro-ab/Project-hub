@@ -76,12 +76,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "panitia_pemilos",
-      "password": "",
-      "adminUrl": "https://pemilos-smpn58.vercel.app/",
+      "username": "",
+      "password": "smpn58jaya",
+      "adminUrl": "https://pemilos-smpn58.vercel.app/admin.html",
       "notes": "Panel kontrol rekapitulasi perolehan suara."
     },
-    "createdAt": "2026-11-09T08:03:00.000Z"
+    "createdAt": "2026-11-09T08:03:00.000Z",
+    "updatedAt": "2026-11-09T10:02:45.911Z"
   },
   {
     "id": "proj-data-guru",
