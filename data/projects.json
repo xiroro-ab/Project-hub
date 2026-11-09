@@ -259,7 +259,8 @@
       "adminUrl": "",
       "notes": "Kuis latihan mandiri siswa."
     },
-    "createdAt": "2026-11-09T08:11:00.000Z"
+    "createdAt": "2026-11-09T08:11:00.000Z",
+    "updatedAt": "2026-11-09T10:43:52.008Z"
   },
   {
     "id": "proj-mpi-infor",
