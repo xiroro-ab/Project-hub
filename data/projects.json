@@ -86,8 +86,8 @@
   },
   {
     "id": "proj-data-guru",
-    "title": "Direktori Data Guru & Tendik SMPN 58",
-    "description": "Basis data digital kepegawaian, daftar guru mata pelajaran, serta tenaga kependidikan sekolah.",
+    "title": "Direktori Data Guru & Tendik SMPN 58 (LAWAS)",
+    "description": "Basis data digital kepegawaian, daftar guru mata pelajaran, serta tenaga kependidikan sekolah. (VERSI LAWAS)",
     "url": "https://xiroro-ab.github.io/smp58dataguru/",
     "category": "Sistem Informasi Sekolah",
     "icon": "users",
@@ -98,12 +98,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "admin_kepegawaian",
-      "password": "",
+      "username": "aris",
+      "password": "guru2550",
       "adminUrl": "https://xiroro-ab.github.io/smp58dataguru/",
       "notes": "Data administrasi dan direktori pendidik."
     },
-    "createdAt": "2026-11-09T08:04:00.000Z"
+    "createdAt": "2026-11-09T08:04:00.000Z",
+    "updatedAt": "2026-11-09T10:07:43.583Z"
   },
   {
     "id": "proj-web-presentasi58",
