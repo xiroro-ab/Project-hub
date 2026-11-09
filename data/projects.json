@@ -529,12 +529,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "admin_safelink",
-      "password": "",
-      "adminUrl": "https://safelinkk.vercel.app",
+      "username": "xiroro",
+      "password": "kampanngh14",
+      "adminUrl": "https://safelinkk.vercel.app/admin",
       "notes": "Konfigurasi redirect gateway & API protect."
     },
-    "createdAt": "2026-11-09T08:24:00.000Z"
+    "createdAt": "2026-11-09T08:24:00.000Z",
+    "updatedAt": "2026-11-09T10:46:11.260Z"
   },
   {
     "id": "proj-toko-script",
