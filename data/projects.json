@@ -487,12 +487,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "xiroro",
+      "username": "",
       "password": "",
       "adminUrl": "https://huggingface.co/spaces/xiroro/PortingApp",
       "notes": "Space repositori HuggingFace dan deployment AI."
     },
-    "createdAt": "2026-11-09T08:22:00.000Z"
+    "createdAt": "2026-11-09T08:22:00.000Z",
+    "updatedAt": "2026-11-09T10:47:33.391Z"
   },
   {
     "id": "proj-rpm58-labs",
