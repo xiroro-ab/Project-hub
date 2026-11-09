@@ -14,138 +14,74 @@ const DATA_DIR = path.join(__dirname, 'data');
 const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
+// Initialize config safely (Vercel serverless friendly: never crash on read-only fs)
+let config = {
+  jwtSecret: process.env.JWT_SECRET || 'ai-project-hub-secret-jwt-key-2026',
+  adminPasswordHash: process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('admin123', 10),
+  isDefaultPassword: true
+};
 
-// Initialize config if not exists
-let config = {};
 if (fs.existsSync(CONFIG_FILE)) {
   try {
-    config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
+    config = JSON.parse(raw);
   } catch (err) {
-    console.error('Error reading config file, regenerating...', err);
+    console.warn('Error reading config file, using fallback:', err.message);
+  }
+} else {
+  // Only attempt write if environment allows
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+  } catch (err) {
+    // Expected on Vercel read-only filesystem
   }
 }
 
-if (!config.jwtSecret) {
-  config.jwtSecret = crypto.randomBytes(32).toString('hex');
-}
-if (!config.adminPasswordHash) {
-  // Default password: admin123
-  const salt = bcrypt.genSaltSync(10);
-  config.adminPasswordHash = bcrypt.hashSync('admin123', salt);
-  config.isDefaultPassword = true;
-}
+// In-memory cache for projects (Serverless resilient)
+let cachedProjects = null;
 
-fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
-
-// Initialize sample projects if not exists
-if (!fs.existsSync(PROJECTS_FILE)) {
-  const initialProjects = [
-    {
-      id: "proj-" + crypto.randomUUID().slice(0, 8),
-      title: "Smart AI Chatbot Assistant",
-      description: "Asisten percakapan cerdas bertenaga LLM untuk customer service dan automasi tanya jawab produk.",
-      url: "https://chat-ai-demo.example.com",
-      category: "Chatbots",
-      icon: "bot",
-      tags: ["Gemini", "FastAPI", "Next.js"],
-      status: "Online",
-      credentials: {
-        username: "admin_chatbot",
-        password: "SuperSecretChatbotPass#2026",
-        adminUrl: "https://chat-ai-demo.example.com/admin",
-        notes: "Akses dashboard admin untuk melihat riwayat log percakapan dan fine-tuning prompt."
-      },
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: "proj-" + crypto.randomUUID().slice(0, 8),
-      title: "Vision OCR & Document Parser",
-      description: "Ekstraksi data faktur, KTP, dan dokumen otomatis menggunakan Vision AI & multimodal analysis.",
-      url: "https://vision-ocr.example.com",
-      category: "Vision / Media",
-      icon: "scan",
-      tags: ["Vision AI", "Python", "Docker"],
-      status: "Online",
-      credentials: {
-        username: "ocr_supervisor",
-        password: "Visi0nSecureKey!99",
-        adminUrl: "https://vision-ocr.example.com/dashboard",
-        notes: "Gunakan API key di panel settings untuk integrasi webhook."
-      },
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: "proj-" + crypto.randomUUID().slice(0, 8),
-      title: "Automated Data Scraping & Pipeline",
-      description: "Robot otomatis pengumpul data pasar dan tren harga komoditas setiap jam secara real-time.",
-      url: "https://scraper-flow.example.com",
-      category: "Automation",
-      icon: "cpu",
-      tags: ["Node.js", "Puppeteer", "PostgreSQL"],
-      status: "Online",
-      credentials: {
-        username: "pipeline_owner",
-        password: "AutoFlowSecure#888",
-        adminUrl: "https://scraper-flow.example.com/cron-jobs",
-        notes: "Jadwal cron job berjalan tiap jam 08:00 WIB."
-      },
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: "proj-" + crypto.randomUUID().slice(0, 8),
-      title: "AI Video Script & Voice Generator",
-      description: "Generator naskah konten TikTok/Reels lengkap dengan voice-over sintetis bahasa Indonesia.",
-      url: "https://aivideo-studio.example.com",
-      category: "Vision / Media",
-      icon: "video",
-      tags: ["ElevenLabs", "GPT", "Vue.js"],
-      status: "Beta",
-      credentials: {
-        username: "creator_studio",
-        password: "CreatorVoicePass$77",
-        adminUrl: "https://aivideo-studio.example.com/studio/admin",
-        notes: "Kuota voice synthesis tersisa 150.000 karakter per bulan."
-      },
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: "proj-" + crypto.randomUUID().slice(0, 8),
-      title: "Analytics & Financial AI Advisor",
-      description: "Dashboard analisis keuangan personal dan bisnis dengan prediksi cashflow menggunakan machine learning.",
-      url: "https://finance-ai-hub.example.com",
-      category: "Web Apps",
-      icon: "trending-up",
-      tags: ["Finance", "React", "Python"],
-      status: "Demo",
-      credentials: {
-        username: "finance_lead",
-        password: "FinAdvis0rSafePass#2026",
-        adminUrl: "https://finance-ai-hub.example.com/settings",
-        notes: "Mode sandbox aktif untuk simulasi data keuangan."
-      },
-      createdAt: new Date().toISOString()
-    }
-  ];
-  fs.writeFileSync(PROJECTS_FILE, JSON.stringify(initialProjects, null, 2), 'utf8');
-}
-
-// Helpers
 function readProjects() {
+  if (cachedProjects) return cachedProjects;
+
+  // 1. Check /tmp/projects.json if updated in serverless environment
+  const tmpFile = path.join('/tmp', 'projects.json');
   try {
-    const raw = fs.readFileSync(PROJECTS_FILE, 'utf8');
-    return JSON.parse(raw);
+    if (fs.existsSync(tmpFile)) {
+      cachedProjects = JSON.parse(fs.readFileSync(tmpFile, 'utf8'));
+      return cachedProjects;
+    }
+  } catch (e) {}
+
+  // 2. Read from packaged ./data/projects.json
+  try {
+    if (fs.existsSync(PROJECTS_FILE)) {
+      cachedProjects = JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf8'));
+      return cachedProjects;
+    }
   } catch (err) {
     console.error('Error reading projects:', err);
-    return [];
   }
+
+  return [];
 }
 
 function writeProjects(projects) {
-  fs.writeFileSync(PROJECTS_FILE, JSON.stringify(projects, null, 2), 'utf8');
+  cachedProjects = projects;
+  // Try writing to data dir
+  try {
+    fs.writeFileSync(PROJECTS_FILE, JSON.stringify(projects, null, 2), 'utf8');
+  } catch (err) {
+    // In Vercel, fallback to /tmp
+    try {
+      const tmpFile = path.join('/tmp', 'projects.json');
+      fs.writeFileSync(tmpFile, JSON.stringify(projects, null, 2), 'utf8');
+    } catch (e) {
+      console.error('Failed to write to /tmp:', e);
+    }
+  }
 }
 
 // Middleware
@@ -179,7 +115,6 @@ function authenticateAdmin(req, res, next) {
 app.get('/api/projects', (req, res) => {
   const allProjects = readProjects();
   const sanitized = allProjects.map(p => {
-    // Return only public metadata
     return {
       id: p.id,
       title: p.title,
@@ -200,10 +135,9 @@ app.get('/api/projects', (req, res) => {
   });
 });
 
-// GET /api/system/time - Waktu server & status Indonesia (WIB/WITA/WIT)
+// GET /api/system/time - Waktu server & status Indonesia (WIB)
 app.get('/api/system/time', (req, res) => {
   const now = new Date();
-  // Format WIB (UTC+7)
   const wibTime = new Intl.DateTimeFormat('id-ID', {
     timeZone: 'Asia/Jakarta',
     hour: '2-digit',
@@ -243,9 +177,11 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(400).json({ error: 'Sandi utama (Master Password) harus diisi.' });
   }
 
-  // Refresh config from file in case it was modified
+  // Refresh config from file if readable
   try {
-    config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    if (fs.existsSync(CONFIG_FILE)) {
+      config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    }
   } catch (e) {}
 
   const match = bcrypt.compareSync(password, config.adminPasswordHash);
@@ -253,7 +189,6 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(401).json({ error: 'Sandi utama salah. Akses ditolak.' });
   }
 
-  // Issue JWT token (valid for 24 hours)
   const token = jwt.sign(
     { role: 'owner', loginAt: new Date().toISOString() },
     config.jwtSecret,
@@ -292,7 +227,12 @@ app.post('/api/auth/change-password', authenticateAdmin, (req, res) => {
   const salt = bcrypt.genSaltSync(10);
   config.adminPasswordHash = bcrypt.hashSync(newPassword, salt);
   config.isDefaultPassword = false;
-  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+
+  try {
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+  } catch (e) {
+    // In Vercel, kept in memory
+  }
 
   res.json({
     success: true,
@@ -304,7 +244,7 @@ app.post('/api/auth/change-password', authenticateAdmin, (req, res) => {
 // ADMIN / VAULT API ENDPOINTS (Hanya Bisa Diakses Setelah Login!)
 // ---------------------------------------------------------------------------
 
-// GET /api/admin/projects - Mengembalikan semua proyek LENGKAP dengan username & password
+// GET /api/admin/projects - Mengembalikan semua proyek LENGKAP dengan kredensial
 app.get('/api/admin/projects', authenticateAdmin, (req, res) => {
   const allProjects = readProjects();
   res.json({
@@ -351,7 +291,7 @@ app.post('/api/admin/projects', authenticateAdmin, (req, res) => {
   });
 });
 
-// PUT /api/admin/projects/:id - Edit project yang sudah ada
+// PUT /api/admin/projects/:id - Edit project
 app.put('/api/admin/projects/:id', authenticateAdmin, (req, res) => {
   const { id } = req.params;
   const { title, description, url, category, icon, tags, status, credentials } = req.body;
@@ -415,11 +355,14 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🌾 AI Project Hub & Vault berjalan di:`);
-  console.log(`👉 http://localhost:${PORT}`);
-  console.log(`Sandi Utama Default (Master Password): admin123`);
-  console.log(`====================================================`);
-});
+// Export app for Vercel Serverless
+module.exports = app;
+
+// Only start HTTP listener if executed directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🌾 AI Project Hub & Vault berjalan di port ${PORT}`);
+    console.log(`====================================================`);
+  });
+}
