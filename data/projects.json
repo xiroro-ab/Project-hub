@@ -276,12 +276,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "guru_infor",
+      "username": "",
       "password": "",
       "adminUrl": "https://mpi-informatika.vercel.app/",
       "notes": "Media pembelajaran interaktif kurikulum Informatika."
     },
-    "createdAt": "2026-11-09T08:12:00.000Z"
+    "createdAt": "2026-11-09T08:12:00.000Z",
+    "updatedAt": "2026-11-09T10:44:07.113Z"
   },
   {
     "id": "proj-sk-komp-aris",
