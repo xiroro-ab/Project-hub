@@ -186,12 +186,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "admin_ujian_v2",
-      "password": "",
-      "adminUrl": "https://xiroro-ab.github.io/ujian-online-v2/",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "palembang58",
+      "adminUrl": "https://xiroro-ab.github.io/ujian-online-v2/#page-guru-login",
       "notes": "Versi 2 sistem ujian interaktif."
     },
-    "createdAt": "2026-11-09T08:08:00.000Z"
+    "createdAt": "2026-11-09T08:08:00.000Z",
+    "updatedAt": "2026-11-09T10:40:35.806Z"
   },
   {
     "id": "proj-ujian-v1",
