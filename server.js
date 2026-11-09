@@ -40,6 +40,14 @@ if (fs.existsSync(CONFIG_FILE)) {
   }
 }
 
+// Projects data loading (require ensures Vercel bundler bundles projects.json)
+let initialProjects = [];
+try {
+  initialProjects = require('./data/projects.json');
+} catch (e) {
+  console.warn('Could not require projects.json directly:', e.message);
+}
+
 // In-memory cache for projects (Serverless resilient)
 let cachedProjects = null;
 
@@ -55,7 +63,13 @@ function readProjects() {
     }
   } catch (e) {}
 
-  // 2. Read from packaged ./data/projects.json
+  // 2. Fallback to bundled initialProjects
+  if (Array.isArray(initialProjects) && initialProjects.length > 0) {
+    cachedProjects = [...initialProjects];
+    return cachedProjects;
+  }
+
+  // 3. Try reading from file
   try {
     if (fs.existsSync(PROJECTS_FILE)) {
       cachedProjects = JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf8'));
@@ -350,9 +364,19 @@ app.delete('/api/admin/projects/:id', authenticateAdmin, (req, res) => {
   });
 });
 
-// Wildcard route to serve index.html
+// Static files and SPA fallback (Safe for both serverless and local)
+const publicDir = path.join(__dirname, 'public');
+const indexPath = path.join(publicDir, 'index.html');
+
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+}
+
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  res.status(404).json({ error: 'Endpoint not found or handled by Vercel CDN.' });
 });
 
 // Export app for Vercel Serverless
