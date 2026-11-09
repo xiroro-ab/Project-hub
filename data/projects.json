@@ -165,12 +165,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "admin_ujian_v3",
-      "password": "",
-      "adminUrl": "https://xiroro-ab.github.io/ujian-online-v3/",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "palembang58",
+      "adminUrl": "https://xiroro-ab.github.io/ujian-online-v3/#page-guru-login",
       "notes": "Generasi ke-3 sistem evaluasi daring."
     },
-    "createdAt": "2026-11-09T08:07:00.000Z"
+    "createdAt": "2026-11-09T08:07:00.000Z",
+    "updatedAt": "2026-11-09T10:41:28.570Z"
   },
   {
     "id": "proj-ujian-v2",
