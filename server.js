@@ -13,36 +13,27 @@ const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
+const CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json');
 
 // Initialize config safely (Vercel serverless friendly: never crash on read-only fs)
+const initialAdminPass = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD_HASH || 'xiroro-vault-pass';
 let config = {
   jwtSecret: process.env.JWT_SECRET || 'ai-project-hub-secret-jwt-key-2026',
   adminPasswordHash: process.env.ADMIN_PASSWORD 
     ? bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10) 
-    : (process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('admin123', 10)),
-  isDefaultPassword: !process.env.ADMIN_PASSWORD && !process.env.ADMIN_PASSWORD_HASH
+    : (process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync(initialAdminPass, 10))
 };
 
 if (fs.existsSync(CONFIG_FILE)) {
   try {
     const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
-    config = JSON.parse(raw);
+    config = { ...config, ...JSON.parse(raw) };
   } catch (err) {
-    console.warn('Error reading config file, using fallback:', err.message);
-  }
-} else {
-  // Only attempt write if environment allows
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
-  } catch (err) {
-    // Expected on Vercel read-only filesystem
+    console.warn('Error reading config file, using environment config:', err.message);
   }
 }
 
-// Projects data loading (require ensures Vercel bundler bundles projects.json)
+// In-memory cache for bundled data
 let initialProjects = [];
 try {
   initialProjects = require('./data/projects.json');
@@ -50,13 +41,25 @@ try {
   console.warn('Could not require projects.json directly:', e.message);
 }
 
-// In-memory cache for projects (Serverless resilient)
+let initialCategories = [
+  "Sistem Informasi Sekolah",
+  "Ujian & Evaluasi (CBT)",
+  "Modul Pembelajaran MPI",
+  "Aplikasi, AI & Tools",
+  "Toko & E-Commerce"
+];
+try {
+  initialCategories = require('./data/categories.json');
+} catch (e) {
+  // Use fallback
+}
+
 let cachedProjects = null;
+let cachedCategories = null;
 
 function readProjects() {
   if (cachedProjects) return cachedProjects;
 
-  // 1. Check /tmp/projects.json if updated in serverless environment
   const tmpFile = path.join('/tmp', 'projects.json');
   try {
     if (fs.existsSync(tmpFile)) {
@@ -65,13 +68,11 @@ function readProjects() {
     }
   } catch (e) {}
 
-  // 2. Fallback to bundled initialProjects
   if (Array.isArray(initialProjects) && initialProjects.length > 0) {
     cachedProjects = [...initialProjects];
     return cachedProjects;
   }
 
-  // 3. Try reading from file
   try {
     if (fs.existsSync(PROJECTS_FILE)) {
       cachedProjects = JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf8'));
@@ -86,18 +87,147 @@ function readProjects() {
 
 function writeProjects(projects) {
   cachedProjects = projects;
-  // Try writing to data dir
   try {
     fs.writeFileSync(PROJECTS_FILE, JSON.stringify(projects, null, 2), 'utf8');
   } catch (err) {
-    // In Vercel, fallback to /tmp
     try {
       const tmpFile = path.join('/tmp', 'projects.json');
       fs.writeFileSync(tmpFile, JSON.stringify(projects, null, 2), 'utf8');
-    } catch (e) {
-      console.error('Failed to write to /tmp:', e);
-    }
+    } catch (e) {}
   }
+}
+
+function readCategories() {
+  if (cachedCategories) return cachedCategories;
+
+  const tmpFile = path.join('/tmp', 'categories.json');
+  try {
+    if (fs.existsSync(tmpFile)) {
+      cachedCategories = JSON.parse(fs.readFileSync(tmpFile, 'utf8'));
+      return cachedCategories;
+    }
+  } catch (e) {}
+
+  if (Array.isArray(initialCategories) && initialCategories.length > 0) {
+    cachedCategories = [...initialCategories];
+    return cachedCategories;
+  }
+
+  try {
+    if (fs.existsSync(CATEGORIES_FILE)) {
+      cachedCategories = JSON.parse(fs.readFileSync(CATEGORIES_FILE, 'utf8'));
+      return cachedCategories;
+    }
+  } catch (err) {}
+
+  return initialCategories;
+}
+
+function writeCategories(categories) {
+  cachedCategories = categories;
+  try {
+    fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(categories, null, 2), 'utf8');
+  } catch (err) {
+    try {
+      const tmpFile = path.join('/tmp', 'categories.json');
+      fs.writeFileSync(tmpFile, JSON.stringify(categories, null, 2), 'utf8');
+    } catch (e) {}
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GITHUB AUTO-SYNC FUNCTION (No Database, Cloud-Synced via GitHub REST API)
+// ---------------------------------------------------------------------------
+async function syncFileToGitHub(filePath, contentObject, commitMessage) {
+  const token = process.env.GITHUB_TOKEN;
+  const repo = process.env.GITHUB_REPO || 'xiroro-ab/Project-hub';
+  const branch = process.env.GITHUB_BRANCH || 'main';
+
+  if (!token) {
+    return { synced: false, reason: 'GITHUB_TOKEN_NOT_CONFIGURED' };
+  }
+
+  try {
+    let sha = null;
+    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'Project-Hub-Vault'
+      }
+    });
+
+    if (getRes.ok) {
+      const fileData = await getRes.json();
+      sha = fileData.sha;
+    }
+
+    const contentBase64 = Buffer.from(JSON.stringify(contentObject, null, 2), 'utf8').toString('base64');
+
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Project-Hub-Vault'
+      },
+      body: JSON.stringify({
+        message: commitMessage,
+        content: contentBase64,
+        sha: sha || undefined,
+        branch: branch
+      })
+    });
+
+    if (putRes.ok) {
+      return { synced: true };
+    } else {
+      const errText = await putRes.text();
+      console.warn(`[GitHub Sync] Error writing ${filePath}:`, errText);
+      return { synced: false, error: errText };
+    }
+  } catch (err) {
+    console.error(`[GitHub Sync] Network error:`, err.message);
+    return { synced: false, error: err.message };
+  }
+}
+
+// Rate Limiter untuk Mencegah Brute Force Login Hacker
+const loginAttempts = new Map(); // IP -> { count, lockUntil }
+
+function checkBruteForce(ip) {
+  const now = Date.now();
+  const record = loginAttempts.get(ip);
+  if (!record) return { allowed: true };
+
+  if (record.lockUntil && now < record.lockUntil) {
+    const remainingSecs = Math.ceil((record.lockUntil - now) / 1000);
+    return { allowed: false, remainingSecs };
+  }
+
+  if (record.lockUntil && now >= record.lockUntil) {
+    loginAttempts.delete(ip);
+    return { allowed: true };
+  }
+
+  return { allowed: true };
+}
+
+function registerLoginFailure(ip) {
+  const now = Date.now();
+  const record = loginAttempts.get(ip) || { count: 0, firstAttempt: now };
+  record.count += 1;
+
+  if (record.count >= 5) {
+    record.lockUntil = now + (5 * 60 * 1000); // Kunci 5 menit jika gagal 5 kali
+  }
+
+  loginAttempts.set(ip, record);
+}
+
+function resetLoginFailure(ip) {
+  loginAttempts.delete(ip);
 }
 
 // Middleware
@@ -123,11 +253,10 @@ function authenticateAdmin(req, res, next) {
 }
 
 // ---------------------------------------------------------------------------
-// PUBLIC API ENDPOINTS (Tidak Mengandung Password/Credentials Sama Sekali!)
+// PUBLIC API ENDPOINTS (Aman dari Hacker & DevTools: credentials di-strip total!)
 // ---------------------------------------------------------------------------
 
 // GET /api/projects - Akses Publik
-// PENTING: Field 'credentials' di-strip total di backend sebelum dikirim ke publik!
 app.get('/api/projects', (req, res) => {
   const allProjects = readProjects();
   const sanitized = allProjects.map(p => {
@@ -148,6 +277,21 @@ app.get('/api/projects', (req, res) => {
     success: true,
     count: sanitized.length,
     projects: sanitized
+  });
+});
+
+// GET /api/categories - Akses Publik
+app.get('/api/categories', (req, res) => {
+  const definedCategories = readCategories();
+  const projects = readProjects();
+  const projectCategories = projects.map(p => p.category).filter(Boolean);
+  
+  // Gabungkan kategori yang terdaftar dan yang dipakai di proyek
+  const allCategories = [...new Set([...definedCategories, ...projectCategories])];
+  
+  res.json({
+    success: true,
+    categories: allCategories
   });
 });
 
@@ -188,6 +332,14 @@ function getIndonesianGreeting(hour) {
 
 // POST /api/auth/login
 app.post('/api/auth/login', (req, res) => {
+  const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const { allowed, remainingSecs } = checkBruteForce(ip);
+  if (!allowed) {
+    return res.status(429).json({ 
+      error: `Terlalu banyak percobaan gagal. Brankas terkunci demi keamanan. Coba lagi dalam ${remainingSecs} detik.` 
+    });
+  }
+
   const { password } = req.body;
   if (!password) {
     return res.status(400).json({ error: 'Sandi utama (Master Password) harus diisi.' });
@@ -196,14 +348,24 @@ app.post('/api/auth/login', (req, res) => {
   // Refresh config from file if readable
   try {
     if (fs.existsSync(CONFIG_FILE)) {
-      config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+      config = { ...config, ...JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) };
     }
   } catch (e) {}
 
-  const match = bcrypt.compareSync(password, config.adminPasswordHash);
+  // Check against ADMIN_PASSWORD from env first, then hash
+  let match = false;
+  if (process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD) {
+    match = true;
+  } else if (config.adminPasswordHash && bcrypt.compareSync(password, config.adminPasswordHash)) {
+    match = true;
+  }
+
   if (!match) {
+    registerLoginFailure(ip);
     return res.status(401).json({ error: 'Sandi utama salah. Akses ditolak.' });
   }
+
+  resetLoginFailure(ip);
 
   const token = jwt.sign(
     { role: 'owner', loginAt: new Date().toISOString() },
@@ -213,9 +375,8 @@ app.post('/api/auth/login', (req, res) => {
 
   res.json({
     success: true,
-    message: 'Otentikasi berhasil. Vault terbuka!',
-    token: token,
-    isDefaultPassword: !!config.isDefaultPassword
+    message: 'Otentikasi berhasil. Brankas Vault terbuka!',
+    token: token
   });
 });
 
@@ -223,8 +384,7 @@ app.post('/api/auth/login', (req, res) => {
 app.get('/api/auth/verify', authenticateAdmin, (req, res) => {
   res.json({
     success: true,
-    valid: true,
-    isDefaultPassword: !!config.isDefaultPassword
+    valid: true
   });
 });
 
@@ -235,20 +395,23 @@ app.post('/api/auth/change-password', authenticateAdmin, (req, res) => {
     return res.status(400).json({ error: 'Sandi baru minimal 6 karakter.' });
   }
 
-  const match = bcrypt.compareSync(currentPassword, config.adminPasswordHash);
+  let match = false;
+  if (process.env.ADMIN_PASSWORD && currentPassword === process.env.ADMIN_PASSWORD) {
+    match = true;
+  } else if (config.adminPasswordHash && bcrypt.compareSync(currentPassword, config.adminPasswordHash)) {
+    match = true;
+  }
+
   if (!match) {
     return res.status(401).json({ error: 'Sandi saat ini tidak cocok.' });
   }
 
   const salt = bcrypt.genSaltSync(10);
   config.adminPasswordHash = bcrypt.hashSync(newPassword, salt);
-  config.isDefaultPassword = false;
 
   try {
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
-  } catch (e) {
-    // In Vercel, kept in memory
-  }
+  } catch (e) {}
 
   res.json({
     success: true,
@@ -259,6 +422,18 @@ app.post('/api/auth/change-password', authenticateAdmin, (req, res) => {
 // ---------------------------------------------------------------------------
 // ADMIN / VAULT API ENDPOINTS (Hanya Bisa Diakses Setelah Login!)
 // ---------------------------------------------------------------------------
+
+// GET /api/admin/sync-status - Cek status integrasi Cloud GitHub
+app.get('/api/admin/sync-status', authenticateAdmin, (req, res) => {
+  const hasGithubToken = !!process.env.GITHUB_TOKEN;
+  res.json({
+    success: true,
+    githubSyncAvailable: hasGithubToken,
+    repo: process.env.GITHUB_REPO || 'xiroro-ab/Project-hub',
+    branch: process.env.GITHUB_BRANCH || 'main',
+    mode: hasGithubToken ? 'github_cloud' : 'local_storage'
+  });
+});
 
 // GET /api/admin/projects - Mengembalikan semua proyek LENGKAP dengan kredensial
 app.get('/api/admin/projects', authenticateAdmin, (req, res) => {
@@ -271,7 +446,7 @@ app.get('/api/admin/projects', authenticateAdmin, (req, res) => {
 });
 
 // POST /api/admin/projects - Tambah project baru
-app.post('/api/admin/projects', authenticateAdmin, (req, res) => {
+app.post('/api/admin/projects', authenticateAdmin, async (req, res) => {
   const { title, description, url, category, icon, tags, status, credentials } = req.body;
 
   if (!title || !url) {
@@ -300,15 +475,28 @@ app.post('/api/admin/projects', authenticateAdmin, (req, res) => {
   projects.unshift(newProject);
   writeProjects(projects);
 
+  // Auto-sync ke GitHub jika token ada
+  let syncResult = { synced: false };
+  if (process.env.GITHUB_TOKEN) {
+    syncResult = await syncFileToGitHub(
+      'data/projects.json',
+      projects,
+      `feat: add project "${newProject.title}" via vault [skip ci]`
+    );
+  }
+
   res.status(201).json({
     success: true,
-    message: 'Project baru berhasil ditambahkan!',
+    message: syncResult.synced 
+      ? 'Project baru berhasil disimpan & disinkronkan ke GitHub!' 
+      : 'Project baru berhasil disimpan!',
+    syncedToGithub: syncResult.synced,
     project: newProject
   });
 });
 
 // PUT /api/admin/projects/:id - Edit project
-app.put('/api/admin/projects/:id', authenticateAdmin, (req, res) => {
+app.put('/api/admin/projects/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { title, description, url, category, icon, tags, status, credentials } = req.body;
 
@@ -339,18 +527,31 @@ app.put('/api/admin/projects/:id', authenticateAdmin, (req, res) => {
 
   writeProjects(projects);
 
+  let syncResult = { synced: false };
+  if (process.env.GITHUB_TOKEN) {
+    syncResult = await syncFileToGitHub(
+      'data/projects.json',
+      projects,
+      `chore: update project "${projects[index].title}" via vault [skip ci]`
+    );
+  }
+
   res.json({
     success: true,
-    message: 'Project berhasil diperbarui!',
+    message: syncResult.synced 
+      ? 'Project berhasil diperbarui & disinkronkan ke GitHub!' 
+      : 'Project berhasil diperbarui!',
+    syncedToGithub: syncResult.synced,
     project: projects[index]
   });
 });
 
 // DELETE /api/admin/projects/:id - Hapus project
-app.delete('/api/admin/projects/:id', authenticateAdmin, (req, res) => {
+app.delete('/api/admin/projects/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   let projects = readProjects();
   const initialLen = projects.length;
+  const targetProject = projects.find(p => p.id === id);
 
   projects = projects.filter(p => p.id !== id);
 
@@ -360,9 +561,93 @@ app.delete('/api/admin/projects/:id', authenticateAdmin, (req, res) => {
 
   writeProjects(projects);
 
+  let syncResult = { synced: false };
+  if (process.env.GITHUB_TOKEN) {
+    syncResult = await syncFileToGitHub(
+      'data/projects.json',
+      projects,
+      `chore: delete project "${targetProject ? targetProject.title : id}" via vault [skip ci]`
+    );
+  }
+
   res.json({
     success: true,
-    message: 'Project berhasil dihapus.'
+    message: syncResult.synced 
+      ? 'Project berhasil dihapus & disinkronkan ke GitHub.' 
+      : 'Project berhasil dihapus.',
+    syncedToGithub: syncResult.synced
+  });
+});
+
+// POST /api/admin/categories - Tambah kategori baru
+app.post('/api/admin/categories', authenticateAdmin, async (req, res) => {
+  const { name } = req.body;
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Nama kategori wajib diisi.' });
+  }
+
+  const categoryName = name.trim();
+  const categories = readCategories();
+
+  if (categories.some(c => c.toLowerCase() === categoryName.toLowerCase())) {
+    return res.status(400).json({ error: 'Kategori tersebut sudah ada.' });
+  }
+
+  categories.push(categoryName);
+  writeCategories(categories);
+
+  let syncResult = { synced: false };
+  if (process.env.GITHUB_TOKEN) {
+    syncResult = await syncFileToGitHub(
+      'data/categories.json',
+      categories,
+      `feat: add category "${categoryName}" via vault [skip ci]`
+    );
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Kategori baru berhasil ditambahkan!',
+    syncedToGithub: syncResult.synced,
+    categories: categories
+  });
+});
+
+// DELETE /api/admin/categories/:name - Hapus kategori kustom
+app.delete('/api/admin/categories/:name', authenticateAdmin, async (req, res) => {
+  const name = decodeURIComponent(req.params.name).trim();
+  const categories = readCategories();
+  const projects = readProjects();
+
+  // Cek apakah ada proyek yang menggunakan kategori ini
+  const usedCount = projects.filter(p => (p.category || '').toLowerCase() === name.toLowerCase()).length;
+  if (usedCount > 0) {
+    return res.status(400).json({ 
+      error: `Kategori "${name}" masih digunakan oleh ${usedCount} project. Pindahkan project tersebut dulu sebelum menghapus kategori.` 
+    });
+  }
+
+  const filtered = categories.filter(c => c.toLowerCase() !== name.toLowerCase());
+  if (filtered.length === categories.length) {
+    return res.status(404).json({ error: 'Kategori tidak ditemukan.' });
+  }
+
+  writeCategories(filtered);
+
+  let syncResult = { synced: false };
+  if (process.env.GITHUB_TOKEN) {
+    syncResult = await syncFileToGitHub(
+      'data/categories.json',
+      filtered,
+      `chore: delete category "${name}" via vault [skip ci]`
+    );
+  }
+
+  res.json({
+    success: true,
+    message: 'Kategori berhasil dihapus.',
+    syncedToGithub: syncResult.synced,
+    categories: filtered
   });
 });
 
