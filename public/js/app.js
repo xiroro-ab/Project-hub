@@ -104,6 +104,27 @@ class AppController {
       changePassForm.addEventListener('submit', (e) => this.handleChangePassword(e));
     }
 
+    // Category selector change (show input if __new__ selected)
+    const catSelect = document.getElementById('proj-category');
+    const newCatInput = document.getElementById('proj-new-category');
+    if (catSelect && newCatInput) {
+      catSelect.addEventListener('change', () => {
+        if (catSelect.value === '__new__') {
+          newCatInput.classList.remove('hidden');
+          newCatInput.focus();
+        } else {
+          newCatInput.classList.add('hidden');
+          newCatInput.value = '';
+        }
+      });
+    }
+
+    // Export Backup Button
+    const btnExport = document.getElementById('btn-export-backup');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => this.exportBackup());
+    }
+
     // Modal Close buttons
     document.querySelectorAll('[data-close-modal]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -535,11 +556,32 @@ class AppController {
       modalTitle.textContent = proj ? 'Edit Project AI' : 'Tambah Project Baru';
     }
 
+    // Populate category dropdown dynamically from existing unique categories
+    const categorySelect = document.getElementById('proj-category');
+    const newCategoryInput = document.getElementById('proj-new-category');
+    if (categorySelect) {
+      const existingCats = [...new Set(this.projects.map(p => p.category).filter(Boolean))].sort();
+      categorySelect.innerHTML = existingCats.map(c => `
+        <option value="${this.escapeHtml(c)}">${this.escapeHtml(c)}</option>
+      `).join('') + `
+        <option value="__new__">➕ + Tambah Kategori Baru...</option>
+      `;
+
+      if (proj && proj.category) {
+        categorySelect.value = proj.category;
+      } else if (existingCats.length > 0) {
+        categorySelect.value = existingCats[0];
+      }
+    }
+    if (newCategoryInput) {
+      newCategoryInput.value = '';
+      newCategoryInput.classList.add('hidden');
+    }
+
     if (form) {
       document.getElementById('proj-title').value = proj ? proj.title : '';
       document.getElementById('proj-url').value = proj ? proj.url : '';
       document.getElementById('proj-description').value = proj ? proj.description : '';
-      document.getElementById('proj-category').value = proj ? proj.category : 'Sistem Informasi Sekolah';
       document.getElementById('proj-tags').value = proj ? (proj.tags || []).join(', ') : '';
       document.getElementById('proj-status').value = proj ? proj.status : 'Online';
 
@@ -558,11 +600,23 @@ class AppController {
     e.preventDefault();
     if (!this.isAdmin || !this.token) return;
 
+    // Determine category (existing or newly created)
+    let category = document.getElementById('proj-category').value;
+    if (category === '__new__') {
+      const customCat = document.getElementById('proj-new-category').value.trim();
+      if (!customCat) {
+        alert('Silakan ketik nama kategori baru Anda.');
+        document.getElementById('proj-new-category').focus();
+        return;
+      }
+      category = customCat;
+    }
+
     const payload = {
       title: document.getElementById('proj-title').value,
       url: document.getElementById('proj-url').value,
       description: document.getElementById('proj-description').value,
-      category: document.getElementById('proj-category').value,
+      category: category,
       tags: document.getElementById('proj-tags').value,
       status: document.getElementById('proj-status').value,
       credentials: {
@@ -676,6 +730,18 @@ class AppController {
         errorEl.classList.remove('hidden');
       }
     }
+  }
+
+  exportBackup() {
+    if (!this.isAdmin) return;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.projects, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `projects-backup-${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    window.toast('Cadangan data (JSON) berhasil diunduh!', 'success');
   }
 
   escapeHtml(text) {

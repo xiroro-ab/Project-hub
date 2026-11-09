@@ -177,12 +177,22 @@
         </p>
       </div>
 
-      <!-- Admin Actions Toolbar (Add Project button) -->
-      <div id="admin-actions-bar" class="hidden mb-5 flex justify-end">
-        <button id="btn-add-project" class="btn-primary text-xs sm:text-sm flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i>
-          <span>Tambah Project Baru</span>
-        </button>
+      <!-- Admin Actions Toolbar (Add Project button & Backup) -->
+      <div id="admin-actions-bar" class="hidden mb-5 flex flex-wrap items-center justify-between gap-2">
+        <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Panel Kontrol Pemilik</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-export-backup" type="button" class="btn-secondary text-xs flex items-center gap-1.5" title="Unduh file backup data proyek">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Cadangkan JSON</span>
+          </button>
+          <button id="btn-add-project" type="button" class="btn-primary text-xs sm:text-sm flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Tambah Project Baru</span>
+          </button>
+        </div>
       </div>
 
       <!-- Search & Filters Container -->
@@ -325,14 +335,18 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label class="block text-xs font-semibold mb-1">Kategori</label>
-              <select id="proj-category" class="form-input">
-                <option value="Sistem Informasi Sekolah">Sistem Informasi Sekolah</option>
-                <option value="Ujian & Evaluasi (CBT)">Ujian & Evaluasi (CBT)</option>
-                <option value="Modul Pembelajaran MPI">Modul Pembelajaran MPI</option>
-                <option value="Aplikasi, AI & Tools">Aplikasi, AI & Tools</option>
-                <option value="Toko & E-Commerce">Toko & E-Commerce</option>
-              </select>
+              <label class="block text-xs font-semibold mb-1">Kategori Proyek</label>
+              <div class="space-y-1.5">
+                <select id="proj-category" class="form-input">
+                  <option value="Sistem Informasi Sekolah">Sistem Informasi Sekolah</option>
+                  <option value="Ujian & Evaluasi (CBT)">Ujian & Evaluasi (CBT)</option>
+                  <option value="Modul Pembelajaran MPI">Modul Pembelajaran MPI</option>
+                  <option value="Aplikasi, AI & Tools">Aplikasi, AI & Tools</option>
+                  <option value="Toko & E-Commerce">Toko & E-Commerce</option>
+                  <option value="__new__">➕ + Tambah Kategori Baru...</option>
+                </select>
+                <input type="text" id="proj-new-category" class="form-input hidden text-xs" placeholder="Ketik nama kategori baru di sini...">
+              </div>
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Status</label>

@@ -17,8 +17,10 @@ const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json');
 // Initialize config safely (Vercel serverless friendly: never crash on read-only fs)
 let config = {
   jwtSecret: process.env.JWT_SECRET || 'ai-project-hub-secret-jwt-key-2026',
-  adminPasswordHash: process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('admin123', 10),
-  isDefaultPassword: true
+  adminPasswordHash: process.env.ADMIN_PASSWORD 
+    ? bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10) 
+    : (process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('admin123', 10)),
+  isDefaultPassword: !process.env.ADMIN_PASSWORD && !process.env.ADMIN_PASSWORD_HASH
 };
 
 if (fs.existsSync(CONFIG_FILE)) {
