@@ -553,11 +553,12 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "seller_mlbb",
-      "password": "",
-      "adminUrl": "https://xiroro-ab.github.io/Toko-Online-Script-Mlbb/",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "kampanngh14",
+      "adminUrl": "https://xiroro-ab.github.io/Toko-Online-Script-Mlbb/admin.html",
       "notes": "Manajemen katalog produk script dan pemesanan."
     },
-    "createdAt": "2026-11-09T08:25:00.000Z"
+    "createdAt": "2026-11-09T08:25:00.000Z",
+    "updatedAt": "2026-11-09T10:48:56.548Z"
   }
 ]
