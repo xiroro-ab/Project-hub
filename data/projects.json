@@ -508,12 +508,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "developer_rpm",
+      "username": "",
       "password": "",
       "adminUrl": "https://rpm58labs.vercel.app/",
       "notes": "Platform uji coba fitur dan riset tools baru."
     },
-    "createdAt": "2026-11-09T08:23:00.000Z"
+    "createdAt": "2026-11-09T08:23:00.000Z",
+    "updatedAt": "2026-11-09T10:47:16.124Z"
   },
   {
     "id": "proj-safelink",
