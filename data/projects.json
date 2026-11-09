@@ -6,7 +6,11 @@
     "url": "https://smpn58.vercel.app/",
     "category": "Sistem Informasi Sekolah",
     "icon": "school",
-    "tags": ["Official Web", "SMPN 58", "Next.js"],
+    "tags": [
+      "Official Web",
+      "SMPN 58",
+      "Next.js"
+    ],
     "status": "Online",
     "credentials": {
       "username": "admin_smpn58",
@@ -23,7 +27,11 @@
     "url": "https://lms-smpn58.vercel.app/",
     "category": "Sistem Informasi Sekolah",
     "icon": "book-open",
-    "tags": ["LMS", "E-Learning", "SMPN 58"],
+    "tags": [
+      "LMS",
+      "E-Learning",
+      "SMPN 58"
+    ],
     "status": "Online",
     "credentials": {
       "username": "guru_smpn58",
@@ -40,7 +48,11 @@
     "url": "https://xiroro-ab.github.io/Absensi-smp58/",
     "category": "Sistem Informasi Sekolah",
     "icon": "clipboard-check",
-    "tags": ["Absensi", "Monitoring", "SMPN 58"],
+    "tags": [
+      "Absensi",
+      "Monitoring",
+      "SMPN 58"
+    ],
     "status": "Online",
     "credentials": {
       "username": "operator_absensi",
@@ -57,7 +69,11 @@
     "url": "https://pemilos-smpn58.vercel.app/",
     "category": "Sistem Informasi Sekolah",
     "icon": "vote",
-    "tags": ["E-Voting", "Pemilos", "Demokrasi"],
+    "tags": [
+      "E-Voting",
+      "Pemilos",
+      "Demokrasi"
+    ],
     "status": "Online",
     "credentials": {
       "username": "panitia_pemilos",
@@ -74,7 +90,11 @@
     "url": "https://xiroro-ab.github.io/smp58dataguru/",
     "category": "Sistem Informasi Sekolah",
     "icon": "users",
-    "tags": ["Database", "Guru & Tendik", "Profil"],
+    "tags": [
+      "Database",
+      "Guru & Tendik",
+      "Profil"
+    ],
     "status": "Online",
     "credentials": {
       "username": "admin_kepegawaian",
@@ -91,7 +111,11 @@
     "url": "https://web-presentasi58.vercel.app/",
     "category": "Sistem Informasi Sekolah",
     "icon": "presentation",
-    "tags": ["Presentasi", "Interactive", "Slides"],
+    "tags": [
+      "Presentasi",
+      "Interactive",
+      "Slides"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -108,7 +132,11 @@
     "url": "https://cbt58.vercel.app/",
     "category": "Ujian & Evaluasi (CBT)",
     "icon": "check-circle-2",
-    "tags": ["CBT", "Assessment", "Cloud"],
+    "tags": [
+      "CBT",
+      "Assessment",
+      "Cloud"
+    ],
     "status": "Online",
     "credentials": {
       "username": "proktor_cbt",
@@ -125,7 +153,11 @@
     "url": "https://xiroro-ab.github.io/ujian-online-v3/#page-landing",
     "category": "Ujian & Evaluasi (CBT)",
     "icon": "file-text",
-    "tags": ["CBT v3", "Ujian Online", "Modern"],
+    "tags": [
+      "CBT v3",
+      "Ujian Online",
+      "Modern"
+    ],
     "status": "Online",
     "credentials": {
       "username": "admin_ujian_v3",
@@ -142,7 +174,11 @@
     "url": "https://xiroro-ab.github.io/ujian-online-v2/#page-landing",
     "category": "Ujian & Evaluasi (CBT)",
     "icon": "file-text",
-    "tags": ["CBT v2", "Ujian Online", "Kuis"],
+    "tags": [
+      "CBT v2",
+      "Ujian Online",
+      "Kuis"
+    ],
     "status": "Online",
     "credentials": {
       "username": "admin_ujian_v2",
@@ -159,7 +195,11 @@
     "url": "https://xiroro-ab.github.io/ujian-online/#page-landing",
     "category": "Ujian & Evaluasi (CBT)",
     "icon": "file-text",
-    "tags": ["CBT v1", "Ujian", "Base"],
+    "tags": [
+      "CBT v1",
+      "Ujian",
+      "Base"
+    ],
     "status": "Online",
     "credentials": {
       "username": "admin_ujian",
@@ -176,7 +216,11 @@
     "url": "https://xiroro-ab.github.io/ujian-online-debugging/#page-landing",
     "category": "Ujian & Evaluasi (CBT)",
     "icon": "bug",
-    "tags": ["Debugging", "Lab", "Testing"],
+    "tags": [
+      "Debugging",
+      "Lab",
+      "Testing"
+    ],
     "status": "Beta",
     "credentials": {
       "username": "tester_debug",
@@ -191,9 +235,13 @@
     "title": "Bank Soal Informatika Kelas 9 Bab 1",
     "description": "Aplikasi kuis dan latihan soal interaktif materi Informatika kelas 9 bab pertama disertai kunci jawaban.",
     "url": "https://xiroro-ab.github.io/soal-informatika-kelas-9-bab1/",
-    "category": "Ujian & Evaluasi (CBT)",
+    "category": "Modul Pembelajaran MPI",
     "icon": "help-circle",
-    "tags": ["Kelas 9", "Informatika", "Latihan Soal"],
+    "tags": [
+      "Kelas 9",
+      "Informatika",
+      "Latihan Soal"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -208,9 +256,13 @@
     "title": "MPI Informatika (Media Pembelajaran Interaktif)",
     "description": "Media pembelajaran interaktif modern mata pelajaran Informatika berbasis web interaktif terstruktur.",
     "url": "https://mpi-informatika.vercel.app/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "monitor",
-    "tags": ["MPI", "Informatika", "Interactive"],
+    "tags": [
+      "MPI",
+      "Informatika",
+      "Interactive"
+    ],
     "status": "Online",
     "credentials": {
       "username": "guru_infor",
@@ -225,9 +277,13 @@
     "title": "Komponen Sistem Komputer (Aris Bermansyah)",
     "description": "Modul edukatif interaktif pengenalan komponen perangkat keras (hardware) dan arsitektur sistem komputer.",
     "url": "https://xiroro-ab.github.io/aris-bermansyah-komponen-sistem-komputer/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "cpu",
-    "tags": ["Hardware", "Sistem Komputer", "Aris Bermansyah"],
+    "tags": [
+      "Hardware",
+      "Sistem Komputer",
+      "Aris Bermansyah"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -242,9 +298,13 @@
     "title": "Modul SK Kelas 8 v2 (Aris Bermansyah)",
     "description": "Modul digital Sistem Komputer edisi revisi kedua untuk siswa kelas 8 dengan visualisasi diagram dan materi lengkap.",
     "url": "https://xiroro-ab.github.io/bab3-sk-kelas8v2-aris/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "layers",
-    "tags": ["Sistem Komputer", "Kelas 8", "Edisi Revisi"],
+    "tags": [
+      "Sistem Komputer",
+      "Kelas 8",
+      "Edisi Revisi"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -259,9 +319,13 @@
     "title": "Modul Bab 7 Algoritma & Pemrograman (AP) Kelas 8",
     "description": "Pembelajaran logika komputasional, struktur algoritma, diagram alir, dan dasar coding untuk kelas 8.",
     "url": "https://xiroro-ab.github.io/bab7-ap-kelas8/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "code",
-    "tags": ["Algoritma", "Coding", "Kelas 8"],
+    "tags": [
+      "Algoritma",
+      "Coding",
+      "Kelas 8"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -276,9 +340,13 @@
     "title": "Modul Bab 3 Sistem Komputer (SK) Kelas 9",
     "description": "E-modul pendalaman konsep sistem komputer, jaringan, dan pertukaran data tingkat kelas 9.",
     "url": "https://xiroro-ab.github.io/bab3-sk-kelas9/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "hard-drive",
-    "tags": ["Sistem Komputer", "Kelas 9", "Informatika"],
+    "tags": [
+      "Sistem Komputer",
+      "Kelas 9",
+      "Informatika"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -293,9 +361,13 @@
     "title": "Modul Bab 2 TIK Kelas 9",
     "description": "Materi pembelajaran Teknologi Informasi dan Komunikasi kelas 9 Bab 2 seputar pengolahan data dan internet.",
     "url": "https://xiroro-ab.github.io/bab2-tik-kelas9/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "globe",
-    "tags": ["TIK", "Kelas 9", "Internet"],
+    "tags": [
+      "TIK",
+      "Kelas 9",
+      "Internet"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -310,9 +382,13 @@
     "title": "Modul Bab 3 Sistem Komputer (SK) Kelas 7",
     "description": "Pengantar awal arsitektur komputer, perangkat input, proses, dan output untuk siswa kelas 7 SMP.",
     "url": "https://xiroro-ab.github.io/bab3-sk-kelas7/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "cpu",
-    "tags": ["Sistem Komputer", "Kelas 7", "Hardware"],
+    "tags": [
+      "Sistem Komputer",
+      "Kelas 7",
+      "Hardware"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -327,9 +403,13 @@
     "title": "Modul Bab 2 TIK Kelas 7",
     "description": "Panduan materi interaktif keterampilan dasar komputer dan pemanfaatan teknologi informasi untuk kelas 7.",
     "url": "https://xiroro-ab.github.io/bab2-tik-kelas7/",
-    "category": "Modul Pembelajaran TIK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "laptop",
-    "tags": ["TIK", "Kelas 7", "Dasar Komputer"],
+    "tags": [
+      "TIK",
+      "Kelas 7",
+      "Dasar Komputer"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -344,9 +424,13 @@
     "title": "Modul Bab 1 BK Kelas 9",
     "description": "Media edukasi Bimbingan dan Konseling (BK) kelas 9 Bab 1 tentang kesiapan diri dan perencanaan karir lanjutan.",
     "url": "https://xiroro-ab.github.io/bab1-bk-kelas9/",
-    "category": "Modul Pembelajaran BK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "heart-handshake",
-    "tags": ["BK", "Kelas 9", "Konseling"],
+    "tags": [
+      "BK",
+      "Kelas 9",
+      "Konseling"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -361,9 +445,13 @@
     "title": "Modul Bab 1 BK Kelas 7",
     "description": "Materi Bimbingan Konseling kelas 7 Bab 1 tentang adaptasi lingkungan belajar baru dan pembentukan karakter.",
     "url": "https://xiroro-ab.github.io/bab1-bk-kelas7/",
-    "category": "Modul Pembelajaran BK",
+    "category": "Modul Pembelajaran MPI",
     "icon": "smile",
-    "tags": ["BK", "Kelas 7", "Adaptasi"],
+    "tags": [
+      "BK",
+      "Kelas 7",
+      "Adaptasi"
+    ],
     "status": "Online",
     "credentials": {
       "username": "",
@@ -380,7 +468,11 @@
     "url": "https://huggingface.co/spaces/xiroro/PortingApp",
     "category": "Aplikasi, AI & Tools",
     "icon": "bot",
-    "tags": ["HuggingFace", "Python", "AI Space"],
+    "tags": [
+      "HuggingFace",
+      "Python",
+      "AI Space"
+    ],
     "status": "Online",
     "credentials": {
       "username": "xiroro",
@@ -397,7 +489,11 @@
     "url": "https://rpm58labs.vercel.app/",
     "category": "Aplikasi, AI & Tools",
     "icon": "flask-conical",
-    "tags": ["Labs", "Experiment", "Vercel"],
+    "tags": [
+      "Labs",
+      "Experiment",
+      "Vercel"
+    ],
     "status": "Online",
     "credentials": {
       "username": "developer_rpm",
@@ -414,7 +510,11 @@
     "url": "https://safelinkk.vercel.app",
     "category": "Aplikasi, AI & Tools",
     "icon": "shield",
-    "tags": ["Safelink", "Security", "Tools"],
+    "tags": [
+      "Safelink",
+      "Security",
+      "Tools"
+    ],
     "status": "Online",
     "credentials": {
       "username": "admin_safelink",
@@ -431,7 +531,11 @@
     "url": "https://xiroro-ab.github.io/Toko-Online-Script-Mlbb/",
     "category": "Toko & E-Commerce",
     "icon": "shopping-bag",
-    "tags": ["E-Commerce", "Script MLBB", "Store"],
+    "tags": [
+      "E-Commerce",
+      "Script MLBB",
+      "Store"
+    ],
     "status": "Online",
     "credentials": {
       "username": "seller_mlbb",
