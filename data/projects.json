@@ -207,12 +207,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "admin_ujian",
-      "password": "",
-      "adminUrl": "https://xiroro-ab.github.io/ujian-online/",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "palembang58",
+      "adminUrl": "https://xiroro-ab.github.io/ujian-online/#page-guru-login",
       "notes": "Versi dasar platform ujian online."
     },
-    "createdAt": "2026-11-09T08:09:00.000Z"
+    "createdAt": "2026-11-09T08:09:00.000Z",
+    "updatedAt": "2026-11-09T10:36:36.004Z"
   },
   {
     "id": "proj-ujian-debug",
