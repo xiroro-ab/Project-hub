@@ -13,12 +13,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "admin_smpn58",
-      "password": "",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "kampanngh14",
       "adminUrl": "https://smpn58.vercel.app/",
       "notes": "Portal publik profil dan informasi SMPN 58."
     },
-    "createdAt": "2026-11-09T08:00:00.000Z"
+    "createdAt": "2026-11-09T08:00:00.000Z",
+    "updatedAt": "2026-11-09T10:19:18.137Z"
   },
   {
     "id": "proj-lms-58",
