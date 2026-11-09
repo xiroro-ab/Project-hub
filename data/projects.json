@@ -120,12 +120,13 @@
     ],
     "status": "Online",
     "credentials": {
-      "username": "",
-      "password": "",
-      "adminUrl": "https://web-presentasi58.vercel.app/",
+      "username": "aris.bermansyah14@gmail.com",
+      "password": "palembang58",
+      "adminUrl": "https://web-presentasi58.vercel.app/admin",
       "notes": "Media presentasi publik kegiatan."
     },
-    "createdAt": "2026-11-09T08:05:00.000Z"
+    "createdAt": "2026-11-09T08:05:00.000Z",
+    "updatedAt": "2026-11-09T10:12:34.936Z"
   },
   {
     "id": "proj-cbt-58",
